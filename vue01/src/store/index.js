@@ -12,9 +12,19 @@ const mutations = {
     },
     sub(state){
         state.count--
+    },
+    subN(state,step){
+        state.count -= step
     }
 };
-const actions = {};
+const actions = {
+    addAsync(context){
+        setTimeout(() => {
+            context.commit('add',3)
+            console.log('niaho')
+        }, 1000);
+    }
+};
 export default new Vuex.Store({
     state,
     mutations,
