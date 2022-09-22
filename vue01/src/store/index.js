@@ -18,15 +18,26 @@ const mutations = {
     }
 };
 const actions = {
-    addAsync(context){
+    addAsync(context,step){
         setTimeout(() => {
-            context.commit('add',3)
+            context.commit('add',step)
             console.log('niaho')
         }, 1000);
-    }
+    },
+    subAsync(context,step){
+        setTimeout(() => {
+            context.commit('subN',step)
+        }, 1000);
+    },
 };
+const getters = {
+    showNum(state){
+        return '当前最新的数量【'+state.count+'】'
+    }
+}
 export default new Vuex.Store({
     state,
     mutations,
-    actions
+    actions,
+    getters
 })
