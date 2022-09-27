@@ -4,29 +4,29 @@
     :value='inputValue' @change="handleInputChange" />
     <a-button type="primary" @click="addItemToList">添加事项</a-button>
 
-    <a-list bordered :dataSource="list" class="dt_list">
+    <a-list bordered :dataSource="infolist" class="dt_list">
       <a-list-item slot='renderItem' slot-scope="item">
         <!-- 复选框 -->
-        <a-checkbox>{{ item.info }}</a-checkbox>
+        <a-checkbox :checked="item.done" @change="(e) => {cbStautsChanged(e,item.id)}">{{ item.info }}</a-checkbox>
         <!-- 删除链接 -->
-        <a slot="actions">删除</a>
+        <a slot="actions" @click="removeItemById(item.id)">删除</a>
       </a-list-item>
 
       <!-- footer区域 -->
       <div class="footer" slot="footer">
-        <span>0条剩余</span>
+        <span>{{unDoneLength}}条剩余</span>
         <a-button-group>
-          <a-button type="primary">全部</a-button>
-          <a-button>未完成</a-button>
-          <a-button>已完成</a-button>
+          <a-button :type="viewkey === 'all' ? 'primary' : 'default' " @click="changeList('all')">全部</a-button>
+          <a-button :type="viewkey === 'unDone' ? 'primary' : 'default' " @click="changeList('unDone')">未完成</a-button>
+          <a-button :type="viewkey === 'done' ? 'primary' : 'default' " @click="changeList('done')">已完成</a-button>
         </a-button-group>
-        <a>清除已完成</a>
+        <a @click="clean">清除已完成</a>
       </div>
     </a-list>
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapState,mapGetters } from 'vuex'
 
 export default {
   name: 'app',
@@ -39,17 +39,35 @@ export default {
     this.$store.dispatch('getList')
   },
   computed:{
-    ...mapState(['list','inputValue'])
+    ...mapState(['inputValue','viewkey']),
+    ...mapGetters(['unDoneLength','infolist'])
   },
   methods:{
     handleInputChange(e){
       this.$store.commit('setInputValue',e.target.value)
     },
     addItemToList(){
-      console.log(this.inputValue);
       if(this.inputValue.trim().length<=0){
         return this.$message.warning('有问题')
       }this.$store.commit('addItem')
+    },
+    removeItemById(id){
+      this.$store.commit('removeItem',id)
+    },
+    // 监听复选框状态变化
+    cbStautsChanged(e,id){
+      const params = {
+        id : id,
+        status : e.target.checked
+      }
+      this.$store.commit('statusChanged',params)
+    },
+    clean(){
+      this.$store.commit('cleanDone')
+    },
+    changeList(key){
+      this.$store.commit('changeViewkey',key)
+      console.log(key)
     }
   }
 }
