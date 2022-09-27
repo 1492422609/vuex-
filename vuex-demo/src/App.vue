@@ -1,7 +1,8 @@
 <template>
   <div id='app'>
-    <a-input placeholder='请输入任务' class='my_ipt' />
-    <a-button type="primary">添加事项</a-button>
+    <a-input placeholder='请输入任务' class='my_ipt' 
+    :value='inputValue' @change="handleInputChange" />
+    <a-button type="primary" @click="addItemToList">添加事项</a-button>
 
     <a-list bordered :dataSource="list" class="dt_list">
       <a-list-item slot='renderItem' slot-scope="item">
@@ -25,37 +26,30 @@
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: 'app',
   data() {
     return {
-      list: [
-        {
-          id: 0,
-          info: 'Racing car sprays burning fuel into crowd.',
-          done: false
-        },
-        {
-          id: 1,
-          info: ' Japanese princess to wed commoner.',
-          done: false
-        },
-        {
-          id: 2,
-          info: 'Australian walks 100km after outback crash.',
-          done: false
-        },
-        {
-          id: 3,
-          info: 'Man charged over missing wedding girl.',
-          done: false
-        },
-        {
-          id: 4,
-          info: 'Los Angeles battles huge wildfires.',
-          done: false
-        }
-      ]
+      
+    }
+  },
+  created() {
+    this.$store.dispatch('getList')
+  },
+  computed:{
+    ...mapState(['list','inputValue'])
+  },
+  methods:{
+    handleInputChange(e){
+      this.$store.commit('setInputValue',e.target.value)
+    },
+    addItemToList(){
+      console.log(this.inputValue);
+      if(this.inputValue.trim().length<=0){
+        return this.$message.warning('有问题')
+      }this.$store.commit('addItem')
     }
   }
 }
